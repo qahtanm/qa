@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#007AFF">
+    <title>إدارة الموازنة المالية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f2f2f7;
+            color: #000;
+            direction: rtl;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,122,255,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #007AFF;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #fafafa;
+            font-family: inherit;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #007AFF;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+        }
+
+        .btn-secondary {
+            background: #f2f2f7;
+            color: #007AFF;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:active {
+            background: #e5e5ea;
+        }
+
+        .btn-danger {
+            background: #FF3B30;
+            color: white;
+            padding: 8px 12px;
+            font-size: 14px;
+            width: auto;
+            margin-top: 5px;
+        }
+
+        .balance-result {
+            background: linear-gradient(135deg, #34C759 0%, #30A14E 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .balance-result.error {
+            background: linear-gradient(135deg, #FF3B30 0%, #D70015 100%);
+        }
+
+        .balance-result h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .balance-result .amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .balance-result .status {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .list-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-right: 4px solid #007AFF;
+        }
+
+        .list-item-info {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .list-item-details {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .list-item-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #007AFF;
+        }
+
+        .month-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-right: 5px solid #007AFF;
+        }
+
+        .month-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: #007AFF;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .month-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-box {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .deficit {
+            color: #FF3B30;
+        }
+
+        .surplus {
+            color: #34C759;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .tab.active {
+            background: #007AFF;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #007AFF;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #5856D6 0%, #4144B8 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .summary-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .month-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💰 إدارة الموازنة المالية</h1>
+        <p>نظام متكامل لإدارة الحسابات والموازنة</p>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('input')">📝 الإدخال</button>
+            <button class="tab" onclick="switchTab('balance')">📊 الموازنة</button>
+            <button class="tab" onclick="switchTab('reports')">📈 التقارير</button>
+        </div>
+
+        <div id="input-tab" class="tab-content active">
+            <div class="card">
+                <div class="card-title">💵 الرصيد الافتتاحي</div>
+                <div class="input-group">
+                    <label>المبلغ</label>
+                    <input type="number" id="opening-balance" placeholder="أدخل الرصيد الافتتاحي" step="0.01">
+                </div>
+                <button class="btn btn-primary" onclick="saveOpeningBalance()">حفظ الرصيد الافتتاحي</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📦 إضافة تجهيز جديد</div>
+                <div class="input-group">
+                    <label>الشهر</label>
+                    <select id="supply-month">
+                        <option value="">اختر الشهر</option>
+                        <option value="1">يناير</option>
+                        <option value="2">فبراير</option>
+                        <option value="3">مارس</option>
+                        <option value="4">أبريل</option>
+                        <option value="5">مايو</option>
+                        <option value="6">يونيو</option>
+                        <option value="7">يوليو</option>
+                        <option value="8">أغسطس</option>
+                        <option value="9">سبتمبر</option>
+                        <option value="10">أكتوبر</option>
+                        <option value="11">نوفمبر</option>
+                        <option value="12">ديسمبر</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>السنة</label>
+                    <input type="number" id="supply-year" placeholder="مثال: 2025" value="2025">
+                </div>
+                <div class="input-group">
+                    <label>المبلغ</label>
+                    <input type="number" id="supply-amount" placeholder="أدخل مبلغ التجهيز" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>وصف (اختياري)</label>
+                    <input type="text" id="supply-desc" placeholder="مثال: تجهيز رواتب، صيانة...">
+                </div>
+                <button class="btn btn-primary" onclick="addSupply()">إضافة التجهيز</button>
+
+                <div id="supplies-list" style="margin-top: 20px;"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📅 البيانات الشهرية</div>
+                <div class="input-group">
+                    <label>اختر الشهر</label>
+                    <select id="monthly-month">
+                        <option value="">اختر الشهر</option>
+                        <option value="1">يناير</option>
+                        <option value="2">فبراير</option>
+                        <option value="3">مارس</option>
+                        <option value="4">أبريل</option>
+                        <option value="5">مايو</option>
+                        <option value="6">يونيو</option>
+                        <option value="7">يوليو</option>
+                        <option value="8">أغسطس</option>
+                        <option value="9">سبتمبر</option>
+                        <option value="10">أكتوبر</option>
+                        <option value="11">نوفمبر</option>
+                        <option value="12">ديسمبر</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>السنة</label>
+                    <input type="number" id="monthly-year" placeholder="مثال: 2025" value="2025">
+                </div>
+                <div class="input-group">
+                    <label>المسدد</label>
+                    <input type="number" id="monthly-paid" placeholder="المبلغ المسدد هذا الشهر" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>الرواتب</label>
+                    <input type="number" id="monthly-salaries" placeholder="رواتب هذا الشهر" step="0.01">
+                </div>
+                <button class="btn btn-primary" onclick="saveMonthlyData()">حفظ البيانات الشهرية</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💵 النقد في الصندوق</div>
+                <div class="input-group">
+                    <label>المبلغ الموجود فعلياً</label>
+                    <input type="number" id="cash-box" placeholder="أدخل النقد الموجود في الصندوق" step="0.01">
+                </div>
+                <button class="btn btn-primary" onclick="saveCashBox()">حفظ النقد</button>
+            </div>
+        </div>
+
+        <div id="balance-tab" class="tab-content">
+            <div class="card">
+                <div class="card-title">⚖️ الموازنة العامة (Balance Sheet)</div>
+                <div id="balance-sheet"></div>
+            </div>
+        </div>
+
+        <div id="reports-tab" class="tab-content">
+            <div class="card">
+                <div class="card-title">📊 التقرير الشامل</div>
+                <div id="comprehensive-report"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📈 التقارير الشهرية</div>
+                <div id="monthly-reports"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MONTHS_AR = ['', 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            if (tabName === 'balance') {
+                calculateBalance();
+            } else if (tabName === 'reports') {
+                showReports();
+            }
+        }
+
+        function saveOpeningBalance() {
+            const amount = parseFloat(document.getElementById('opening-balance').value);
+            if (isNaN(amount) || amount < 0) {
+                alert('⚠️ الرجاء إدخال مبلغ صحيح');
+                return;
+            }
+            localStorage.setItem('openingBalance', amount);
+            alert('✅ تم حفظ الرصيد الافتتاحي بنجاح');
+            document.getElementById('opening-balance').value = amount;
+            calculateBalance();
+        }
+
+        function addSupply() {
+            const month = document.getElementById('supply-month').value;
+            const year = document.getElementById('supply-year').value;
+            const amount = parseFloat(document.getElementById('supply-amount').value);
+            const desc = document.getElementById('supply-desc').value;
+
+            if (!month || !year || isNaN(amount) || amount <= 0) {
+                alert('⚠️ الرجاء ملء جميع الحقول المطلوبة بشكل صحيح');
+                return;
+            }
+
+            const supplies = JSON.parse(localStorage.getItem('supplies') || '[]');
+            supplies.push({
+                id: Date.now(),
+                month: parseInt(month),
+                year: parseInt(year),
+                amount: amount,
+                description: desc,
+                date: new Date().toISOString()
+            });
+
+            localStorage.setItem('supplies', JSON.stringify(supplies));
+            
+            document.getElementById('supply-month').value = '';
+            document.getElementById('supply-amount').value = '';
+            document.getElementById('supply-desc').value = '';
+            
+            alert('✅ تم إضافة التجهيز بنجاح');
+            displaySupplies();
+            calculateBalance();
+        }
+
+        function deleteSupply(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا التجهيز؟')) return;
+            
+            const supplies = JSON.parse(localStorage.getItem('supplies') || '[]');
+            const filtered = supplies.filter(s => s.id !== id);
+            localStorage.setItem('supplies', JSON.stringify(filtered));
+            displaySupplies();
+            calculateBalance();
+            alert('✅ تم حذف التجهيز');
+        }
+
+        function displaySupplies() {
+            const supplies = JSON.parse(localStorage.getItem('supplies') || '[]');
+            const container = document.getElementById('supplies-list');
+            
+            if (supplies.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📦</div><p>لا توجد عمليات تجهيز</p></div>';
+                return;
+            }
+
+            let html = '<h4 style="margin-bottom: 10px; color: #007AFF;">📋 عمليات التجهيز المسجلة</h4>';
+            supplies.forEach(supply => {
+                html += `
+                    <div class="list-item">
+                        <div class="list-item-info">
+                            <div class="list-item-title">${MONTHS_AR[supply.month]} ${supply.year}</div>
+                            <div class="list-item-details">${supply.description || 'تجهيز'}</div>
+                        </div>
+                        <div style="text-align: left;">
+                            <div class="list-item-amount">${supply.amount.toLocaleString('ar-SA')} د.ع</div>
+                            <button class="btn-danger" onclick="deleteSupply(${supply.id})">حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function saveMonthlyData() {
+            const month = document.getElementById('monthly-month').value;
+            const year = document.getElementById('monthly-year').value;
+            const paid = parseFloat(document.getElementById('monthly-paid').value);
+            const salaries = parseFloat(document.getElementById('monthly-salaries').value);
+
+            if (!month || !year || isNaN(paid) || isNaN(salaries)) {
+                alert('⚠️ الرجاء ملء جميع الحقول بشكل صحيح');
+                return;
+            }
+
+            const monthlyData = JSON.parse(localStorage.getItem('monthlyData') || '{}');
+            const key = `${year}-${month}`;
+            
+            monthlyData[key] = {
+                month: parseInt(month),
+                year: parseInt(year),
+                paid: paid,
+                salaries: salaries,
+                deficit: salaries - paid
+            };
+
+            localStorage.setItem('monthlyData', JSON.stringify(monthlyData));
+            
+            document.getElementById('monthly-month').value = '';
+            document.getElementById('monthly-paid').value = '';
+            document.getElementById('monthly-salaries').value = '';
+            
+            calculateBalance();
+            alert('✅ تم حفظ البيانات الشهرية بنجاح');
+        }
+
+        function saveCashBox() {
+            const amount = parseFloat(document.getElementById('cash-box').value);
+            if (isNaN(amount) || amount < 0) {
+                alert('⚠️ الرجاء إدخال مبلغ صحيح');
+                return;
+            }
+            localStorage.setItem('cashBox', amount);
+            calculateBalance();
+            alert('✅ تم حفظ النقد في الصندوق بنجاح');
+            document.getElementById('cash-box').value = amount;
+        }
+
+        function calculateBalance() {
+            const openingBalance = parseFloat(localStorage.getItem('openingBalance') || '0');
+            const supplies = JSON.parse(localStorage.getItem('supplies') || '[]');
+            const monthlyData = JSON.parse(localStorage.getItem('monthlyData') || '{}');
+            const cashBox = parseFloat(localStorage.getItem('cashBox') || '0');
+
+            const totalSupplies = supplies.reduce((sum, s) => sum + s.amount, 0);
+            const totalPaid = Object.values(monthlyData).reduce((sum, m) => sum + m.paid, 0);
+
+            const remainingBalance = openingBalance + totalSupplies - totalPaid - cashBox;
+
+            const leftSide = totalPaid + remainingBalance + cashBox;
+            const rightSide = openingBalance + totalSupplies;
+
+            const difference = Math.abs(leftSide - rightSide);
+            const isBalanced = difference < 0.01;
+
+            const container = document.getElementById('balance-sheet');
+            
+            let html = `
+                <div class="summary-box">
+                    <div class="summary-label">الرصيد الافتتاحي</div>
+                    <div class="summary-value">${openingBalance.toLocaleString('ar-SA')} د.ع</div>
+                </div>
+
+                <div class="summary-box" style="background: linear-gradient(135deg, #FF9500 0%, #FF6B00 100%);">
+                    <div class="summary-label">إجمالي التجهيزات</div>
+                    <div class="summary-value">${totalSupplies.toLocaleString('ar-SA')} د.ع</div>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">إجمالي المسدد</span>
+                    <span class="info-value">${totalPaid.toLocaleString('ar-SA')} د.ع</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">الرصيد الباقي المحسوب</span>
+                    <span class="info-value">${remainingBalance.toLocaleString('ar-SA')} د.ع</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">النقد في الصندوق</span>
+                    <span class="info-value">${cashBox.toLocaleString('ar-SA')} د.ع</span>
+                </div>
+
+                <hr style="margin: 20px 0; border: none; border-top: 2px solid #f0f0f0;">
+
+                <div class="info-row" style="font-weight: 700; font-size: 16px;">
+                    <span class="info-label">الجانب الأيمن (الأصول)</span>
+                    <span class="info-value" style="color: #007AFF;">${rightSide.toLocaleString('ar-SA')} د.ع</span>
+                </div>
+
+                <div class="info-row" style="font-weight: 700; font-size: 16px;">
+                    <span class="info-label">الجانب الأيسر (الاستخدامات)</span>
+                    <span class="info-value" style="color: #007AFF;">${leftSide.toLocaleString('ar-SA')} د.ع</span>
+                </div>
+
+                <div class="balance-result ${isBalanced ? '' : 'error'}">
+                    <div class="status">${isBalanced ? '✅ الموازنة متوازنة' : '❌ يوجد خلل في الموازنة'}</div>
+                    ${!isBalanced ? `<div style="margin-top: 10px; font-size: 16px;">الفرق: ${difference.toLocaleString('ar-SA')} د.ع</div>` : ''}
+                    ${!isBalanced ? `<div style="margin-top: 5px; font-size: 14px; opacity: 0.9;">${leftSide > rightSide ? '(فائض)' : '(عجز)'}</div>` : ''}
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function showReports() {
+            const openingBalance = parseFloat(localStorage.getItem('openingBalance') || '0');
+            const supplies = JSON.parse(localStorage.getItem('supplies') || '[]');
+            const monthlyData = JSON.parse(localStorage.getItem('monthlyData') || '{}');
+            const cashBox = parseFloat(localStorage.getItem('cashBox') || '0');
+
+            const totalSupplies = supplies.reduce((sum, s) => sum + s.amount, 0);
+            const totalPaid = Object.values(monthlyData).reduce((sum, m) => sum + m.paid, 0);
+            const totalSalaries = Object.values(monthlyData).reduce((sum, m) => sum + m.salaries, 0);
+            const totalDeficit = Object.values(monthlyData).reduce((sum, m) => sum + m.deficit, 0);
+
+            const comprehensiveContainer = document.getElementById('comprehensive-report');
+            comprehensiveContainer.innerHTML = `
+                <div class="grid-2">
+                    <div class="summary-box">
+                        <div class="summary-label">الرصيد الافتتاحي</div>
+                        <div class="summary-value">${openingBalance.toLocaleString('ar-SA')}</div>
+                    </div>
+                    <div class="summary-box" style="background: linear-gradient(135deg, #FF9500 0%, #FF6B00 100%);">
+                        <div class="summary-label">إجمالي التجهيزات</div>
+                        <div class="summary-value">${totalSupplies.toLocaleString('ar-SA')}</div>
+                    </div>
+                    <div class="summary-box" style="background: linear-gradient(135deg, #34C759 0%, #30A14E 100%);">
+                        <div class="summary-label">إجمالي المسدد</div>
+                        <div class="summary-value">${totalPaid.toLocaleString('ar-SA')}</div>
+                    </div>
+                    <div class="summary-box" style="background: linear-gradient(135deg, #FF3B30 0%, #D70015 100%);">
+                        <div class="summary-label">إجمالي الرواتب</div>
+                        <div class="summary-value">${totalSalaries.toLocaleString('ar-SA')}</div>
+                    </div>
+                </div>
+                <div class="summary-box" style="background: linear-gradient(135deg, ${totalDeficit >= 0 ? '#FF3B30 0%, #D70015' : '#34C759 0%, #30A14E'} 100%); margin-top: 10px;">
+                    <div class="summary-label">إجمالي ${totalDeficit >= 0 ? 'العجز' : 'الفائض'}</div>
+                    <div class="summary-value">${Math.abs(totalDeficit).toLocaleString('ar-SA')} د.ع</div>
+                </div>
+                <div class="info-row" style="margin-top: 15px;">
+                    <span class="info-label">النقد في الصندوق</span>
+                    <span class="info-value">${cashBox.toLocaleString('ar-SA')} د.ع</span>
+                </div>
+            `;
+
+            const monthlyContainer = document.getElementById('monthly-reports');
+            if (Object.keys(monthlyData).length === 0) {
+                monthlyContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div><p>لا توجد بيانات شهرية</p></div>';
+                return;
+            }
+
+            let monthlyHtml = '';
+            const sortedMonths = Object.entries(monthlyData).sort((a, b) => {
+                const [yearA, monthA] = a[0].split('-').map(Number);
+                const [yearB, monthB] = b[0].split('-').map(Number);
+                if (yearA !== yearB) return yearB - yearA;
+                return monthB - monthA;
+            });
+
+            sortedMonths.forEach(([key, data]) => {
+                const deficitClass = data.deficit > 0 ? 'deficit' : data.deficit < 0 ? 'surplus' : '';
+                const deficitLabel = data.deficit > 0 ? 'عجز' : data.deficit < 0 ? 'فائض' : 'متوازن';
+                
+                monthlyHtml += `
+                    <div class="month-card">
+                        <div class="month-header">
+                            <span>${MONTHS_AR[data.month]} ${data.year}</span>
+                            <span class="badge">${deficitLabel}</span>
+                        </div>
+                        <div class="month-stats">
+                            <div class="stat-box">
+                                <div class="stat-label">المسدد</div>
+                                <div class="stat-value">${data.paid.toLocaleString('ar-SA')} د.ع</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">الرواتب</div>
+                                <div class="stat-value">${data.salaries.toLocaleString('ar-SA')} د.ع</div>
+                            </div>
+                            <div class="stat-box" style="grid-column: 1 / -1;">
+                                <div class="stat-label">${deficitLabel}</div>
+                                <div class="stat-value ${deficitClass}">${Math.abs(data.deficit).toLocaleString('ar-SA')} د.ع</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            monthlyContainer.innerHTML = monthlyHtml;
+        }
+
+        window.onload = function() {
+            const openingBalance = localStorage.getItem('openingBalance');
+            if (openingBalance) {
+                document.getElementById('opening-balance').value = openingBalance;
+            }
+
+            const cashBox = localStorage.getItem('cashBox');
+            if (cashBox) {
+                document.getElementById('cash-box').value = cashBox;
+            }
+
+            displaySupplies();
+        };
+    </script>
+</body>
+</html>
